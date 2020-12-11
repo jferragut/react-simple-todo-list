@@ -32,7 +32,7 @@ export function Home() {
 
 	return (
 		<div className="d-flex flex-column align-items-center justify-content-center wrap">
-			<h1>Simple TODO</h1>
+			<h1 className="mb-4">Simple To-Do</h1>
 			<div className="todo-container">
 				<ul className="list-group">
 					<li className="list-group-item">
@@ -71,7 +71,7 @@ export function Home() {
 				<div className="list-group-item footer">
 					{list.length > 0
 						? `${list.length} item${
-								list.length > 1 ? "s" : null
+								list.length > 1 ? "s" : ""
 						  } left`
 						: "All Caught Up!"}
 				</div>
