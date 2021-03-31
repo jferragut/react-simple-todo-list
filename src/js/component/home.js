@@ -12,7 +12,7 @@ export function Home() {
 		{ label: "Develop super powers", done: false },
 		{ label: "Get a Labotomy", done: false }
 	]);
-	// const [list, setList] = useState([]);
+	const [done, setDone] = useState(1);
 
 	const handleKeyPress = e => {
 		if (e.key === "Enter") {
@@ -21,12 +21,24 @@ export function Home() {
 		}
 	};
 
-	const deleteTodo = index => setList(list.filter((item, i) => i !== index));
+	const deleteTodo = index => {
+		let newList = list.filter((item, i) => i !== index);
+		setList(newList);
+		let count = 0;
+		for (let i = 0; i < newList.length; i++) {
+			newList[i].done && count++;
+		}
+		setDone(count);
+	};
 
 	const handleCompleteTodo = index => {
 		let newList = [].concat(list);
 		newList[index].done = !newList[index].done;
-
+		let count = 0;
+		for (let i = 0; i < newList.length; i++) {
+			newList[i].done && count++;
+		}
+		setDone(count);
 		setList(newList);
 	};
 
@@ -69,11 +81,14 @@ export function Home() {
 					))}
 				</ul>
 				<div className="list-group-item footer">
-					{list.length > 0
+					{list.length > 0 && list.length - done > 0
 						? `${list.length} item${
-								list.length > 1 ? "s" : ""
-						  } left`
+								list.length > 1 ? "s total (" : " total ("
+						  }`
 						: "All Caught Up!"}
+					{list.length > 0 && list.length - done > 0
+						? `${list.length - done} unfinished)`
+						: ""}
 				</div>
 			</div>
 		</div>
