@@ -63,6 +63,8 @@ export function Home() {
 					list.map((item, index) => (
 						<li className="list-group-item" key={index}>
 							<div
+								role="button"
+								tabIndex="0"
 								className={
 									item.done
 										? "status border rounded-circle d-inline-block done mr-3"
@@ -80,7 +82,7 @@ export function Home() {
 						</li>
 					))}
 				</ul>
-				<div className="list-group-item footer">
+				<div className="list-group-item footer d-flex justify-content-between">
 					{list.length > 0 && list.length - done > 0
 						? `${list.length} item${
 								list.length > 1 ? "s total (" : " total ("
@@ -89,6 +91,17 @@ export function Home() {
 					{list.length > 0 && list.length - done > 0
 						? `${list.length - done} unfinished)`
 						: ""}
+
+					<span
+						role="button"
+						tabIndex="0"
+						className="clear"
+						onClick={() => {
+							console.log("clicked");
+							setList([]);
+						}}>
+						Clear List
+					</span>
 				</div>
 			</div>
 		</div>
