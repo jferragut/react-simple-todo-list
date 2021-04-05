@@ -1,7 +1,5 @@
-import React, { useState } from "react";
-
-//include images into your bundle
-import rigoImage from "../../img/rigo-baby.jpg";
+import React, { useState, useEffect } from "react";
+const base_url = "https://assets.breatheco.de/apis/fake/todos/user/jferragut";
 
 //create your first component
 export function Home() {
@@ -13,33 +11,78 @@ export function Home() {
 		{ label: "Get a Labotomy", done: false }
 	]);
 	const [done, setDone] = useState(1);
+	const emptyList = [{ label: "Sample Todo", done: false }]; // for reset
+
+	useEffect(() => {
+		syncData();
+	}, []);
+
+	const syncData = () => {
+		fetch(base_url)
+			.then(res => {
+				if (!res.ok)
+					throw new Error(`${res.status} - ${res.statusText}`);
+				return res.json();
+			})
+			.then(data => {
+				setList(data);
+				calculateDone(data);
+			})
+			.catch(err => console.error(err));
+	};
+
+	const updateData = data => {
+		fetch(base_url, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(data)
+		})
+			.then(res => {
+				if (!res.ok)
+					throw new Error(`${res.status} - ${res.statusText}`);
+				return res.json();
+			})
+			.then(data => syncData())
+			.catch(err => console.error(err));
+	};
 
 	const handleKeyPress = e => {
-		if (e.key === "Enter") {
-			setList(list.concat({ label: currentTodo, done: false }));
+		if (e.key === "Enter" && currentTodo !== "") {
+			let newList = list.concat({ label: currentTodo, done: false });
+			updateData(newList);
+			calculateDone(newList);
 			setCurrentTodo("");
 		}
 	};
 
 	const deleteTodo = index => {
-		let newList = list.filter((item, i) => i !== index);
-		setList(newList);
-		let count = 0;
-		for (let i = 0; i < newList.length; i++) {
-			newList[i].done && count++;
+		let newList = [];
+
+		if (list.length > 1) {
+			newList = list.filter((item, i) => i !== index);
+		} else {
+			newList = emptyList;
 		}
-		setDone(count);
+
+		updateData(newList);
+		calculateDone(newList);
 	};
 
 	const handleCompleteTodo = index => {
 		let newList = [].concat(list);
 		newList[index].done = !newList[index].done;
+		calculateDone(newList);
+		updateData(newList);
+	};
+
+	const calculateDone = list => {
 		let count = 0;
-		for (let i = 0; i < newList.length; i++) {
-			newList[i].done && count++;
+		for (let i = 0; i < list.length; i++) {
+			list[i].done && count++;
 		}
 		setDone(count);
-		setList(newList);
 	};
 
 	return (
@@ -95,11 +138,8 @@ export function Home() {
 					<span
 						role="button"
 						tabIndex="0"
-						className="clear"
-						onClick={() => {
-							console.log("clicked");
-							setList([]);
-						}}>
+						className="btn btn-sm btn-outline-danger clear"
+						onClick={() => updateData(emptyList)}>
 						Clear List
 					</span>
 				</div>
